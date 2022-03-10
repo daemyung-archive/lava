@@ -30,7 +30,7 @@ uint32_t make_version(T ver) {
 }
 
 instance::instance(const descriptor& desc) {
-    auto app_info = VkApplicationInfo {
+    const VkApplicationInfo vk_application_info {
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
         .pApplicationName = desc.app.name,
         .applicationVersion = make_version(desc.app.version),
@@ -39,16 +39,16 @@ instance::instance(const descriptor& desc) {
         .apiVersion = VK_API_VERSION_1_3
     };
 
-    auto create_info = VkInstanceCreateInfo {
+    const VkInstanceCreateInfo vk_create_info {
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-        .pApplicationInfo = &app_info,
+        .pApplicationInfo = &vk_application_info,
         .enabledLayerCount = static_cast<uint32_t>(desc.layers.size()),
         .ppEnabledLayerNames = desc.layers.data(),
         .enabledExtensionCount = static_cast<uint32_t>(desc.extensions.size()),
         .ppEnabledExtensionNames = desc.extensions.data()
     };
 
-    switch (vkCreateInstance(&create_info, nullptr, &instance_)) {
+    switch (vkCreateInstance(&vk_create_info, nullptr, &vk_instance_)) {
     case VK_ERROR_OUT_OF_HOST_MEMORY:
         throw std::runtime_error("error: out of host memory.");
     case VK_ERROR_OUT_OF_DEVICE_MEMORY:
@@ -67,30 +67,34 @@ instance::instance(const descriptor& desc) {
 }
 
 instance::instance(instance&& other) noexcept {
-    if (instance_ != VK_NULL_HANDLE) {
-        vkDestroyInstance(instance_, nullptr);
+    if (vk_instance_ != VK_NULL_HANDLE) {
+        vkDestroyInstance(vk_instance_, nullptr);
     }
-    instance_ = other.instance_;
-    other.instance_ = VK_NULL_HANDLE;
+    vk_instance_ = other.vk_instance_;
+    other.vk_instance_ = VK_NULL_HANDLE;
 }
 
 instance::~instance() {
-    if (instance_ != VK_NULL_HANDLE) {
-        vkDestroyInstance(instance_, nullptr);
+    if (vk_instance_ != VK_NULL_HANDLE) {
+        vkDestroyInstance(vk_instance_, nullptr);
     }
 }
 
 instance& instance::operator=(instance&& other) noexcept {
-    if (instance_ != VK_NULL_HANDLE) {
-        vkDestroyInstance(instance_, nullptr);
+    if (vk_instance_ != VK_NULL_HANDLE) {
+        vkDestroyInstance(vk_instance_, nullptr);
     }
-    instance_ = other.instance_;
-    other.instance_ = VK_NULL_HANDLE;
+    vk_instance_ = other.vk_instance_;
+    other.vk_instance_ = VK_NULL_HANDLE;
     return *this;
 }
 
 instance::operator bool() const {
-    return instance_ != VK_NULL_HANDLE;
+    return vk_instance_ != VK_NULL_HANDLE;
+}
+
+instance::operator VkInstance() const {
+    return vk_instance_;
 }
 
 } // namespace lava

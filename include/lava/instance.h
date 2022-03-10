@@ -67,8 +67,10 @@ public:
 
     explicit operator bool() const;
 
+    explicit operator VkInstance() const;
+
 private:
-    VkInstance instance_ = VK_NULL_HANDLE;
+    VkInstance vk_instance_ = VK_NULL_HANDLE;
 };
 
 } // namespace lava

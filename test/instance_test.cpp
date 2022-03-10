@@ -122,3 +122,12 @@ TEST_CASE("move instance", "[instance]") {
     CHECK(inst0);
     CHECK_FALSE(inst1);
 }
+
+TEST_CASE("cast instance", "[instance]") {
+    instance inst0;
+    CHECK(static_cast<VkInstance>(inst0) == VK_NULL_HANDLE);
+
+    instance::descriptor desc {};
+    instance inst1(desc);
+    CHECK(static_cast<VkInstance>(inst1) != VK_NULL_HANDLE);
+}
