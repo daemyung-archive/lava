@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 #include <catch.hpp>
-#include <lava/instance.h>
+#include <lava.h>
 
 using namespace lava;
 
@@ -130,4 +130,10 @@ TEST_CASE("cast instance", "[instance]") {
     instance::descriptor desc {};
     instance inst1(desc);
     CHECK(static_cast<VkInstance>(inst1) != VK_NULL_HANDLE);
+}
+
+TEST_CASE("get physical devices", "[instance]") {
+    instance::descriptor desc {};
+    instance inst(desc);
+    CHECK_NOTHROW(inst.physical_devices());
 }

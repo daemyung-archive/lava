@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "lava/instance.h"
+#include "lava/physical_device.h"
 
 namespace lava {
 
@@ -97,4 +98,8 @@ instance::operator VkInstance() const {
     return vk_instance_;
 }
 
-} // namespace lava
+std::vector<physical_device> instance::physical_devices() const {
+    return physical_device::enumerate(*this);
+}
+
+} //namespace lava

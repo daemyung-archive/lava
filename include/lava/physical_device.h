@@ -20,63 +20,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef LAVA_INSTANCE_H
-#define LAVA_INSTANCE_H
+#ifndef LAVA_PHYSICAL_DEVICE_H
+#define LAVA_PHYSICAL_DEVICE_H
 
 #include <vector>
 #include <vulkan/vulkan.h>
 
 namespace lava {
 
-class physical_device;
+class instance;
 
-class instance {
+class physical_device {
 public:
     struct descriptor {
-          struct {
-              const char* name;
-              struct {
-                  uint8_t major;
-                  uint8_t minor;
-                  uint8_t patch;
-              } version;
-          } app;
-          struct {
-              const char* name;
-              struct {
-                  uint8_t major;
-                  uint8_t minor;
-                  uint8_t patch;
-              } version;
-          } engine;
-          std::vector<const char*> layers;
-          std::vector<const char*> extensions;
+        instance const* master = nullptr;
+        size_t index = 0;
     };
 
-    instance() = default;
+    static size_t count(const instance& instance);
 
-    explicit instance(const descriptor& desc);
+    static std::vector<physical_device> enumerate(instance const& instance);
 
-    explicit instance(const instance& other) = delete;
+    physical_device() = default;
 
-    instance(instance&& other) noexcept;
-
-    ~instance();
-
-    instance& operator=(const instance& other) = delete;
-
-    instance& operator=(instance&& other) noexcept;
+    explicit physical_device(const descriptor& desc);
 
     explicit operator bool() const;
 
-    explicit operator VkInstance() const;
+    explicit operator VkPhysicalDevice() const;
 
-    std::vector<physical_device> physical_devices() const;
+    instance const* master() const noexcept;
+
+    size_t index() const noexcept;
 
 private:
-    VkInstance vk_instance_ = VK_NULL_HANDLE;
+    instance const* master_ = nullptr;
+    size_t index_ = SIZE_MAX;
+    VkPhysicalDevice vk_physical_device_ = VK_NULL_HANDLE;
 };
 
 } //namespace lava
 
-#endif //LAVA_INSTANCE_H
+#endif //LAVA_PHYSICAL_DEVICE_H
